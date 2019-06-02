@@ -1,0 +1,237 @@
+Linux达人养成计划（二）
+
+第一章VIM文本编辑器
+
+
+1-1 VIM编辑器概述
+
+* Visual Interface
+* 可视化接口
+*类似Windows中的记事本
+*VI相对于记事本强大的不是一星半点
+*VI -> VIM
+*VIM相对于VI做了哪些提升
+   - VIM支持多级撤销
+   - VIM可以跨平台运行
+   - VIM支持语法高亮
+   - VIM支持图形界面
+
+1-2 VI编辑器的操作模式
+
+*Command Mode-命令模式
+*Insert Mode-输入模式
+*Last Line Mode-底行模式（尾行，末行）
+#vim 编辑文本，两次敲击D键，表示删除光标所在行
+
+1-3 VIM编辑器的命令模式
+
+#vim abc
+*打开文件后，默认的一般光标定位到第一行
+#vim +abc
+*打开文件abc后，光标定位到最后一行
+#vim +3 abc
+*打开文件abc后，光标定位到第三行
+#vim +/xxx abc
+*打开文件abc后，光标定位到单词xxx第一次出现的地方，按N键来回切换
+#vim aa bb cc
+*一次打开或者创建多个文件，输入：n，切换文件，输入：N或者：prev，切换至原来文件
+
+1-4底行模式和命令模式常用指令
+
+*底行模式常用命令
+   - ：w   将文件的修改从内存保存到硬盘中，也就是执行保存修改
+   - ：q   退出当前编辑器打开的文件
+   - ：！  强制执行
+   - ：ls 列出当前编辑器中打开的所有文件
+   - ：n   切换到后一个文件 ：N 切换到后一个文件
+   - ：15  把光标快速定位到第15行
+   - /xxx  从光标位置开始，向后搜索xxx字符串，当光标找到第一个出现的xxx时，光标定位到那里
+   - ?xxx  从光标位置开始，向前搜索xxx字符串，当光标找到第一个出现的xxx时，光标定位到那里
+ *命令模式常用指令
+    -h 光标左移
+    -j 光标下移
+    -k 光标上移
+    -l 光标右移
+    -Ctrl + f 向下翻页（front）
+    -Ctrl + b 向上翻页（back）
+    -Ctrl + d 向下翻半页（down)
+    -Ctrl + u 向上翻半页（up）
+    -dd  删除光标所在行
+    -o   在光标所在行的下方插入一行并切换到输入模式
+    -yy  复制光标所在行
+    -p   在光标所在行的下方粘贴
+    -P   在光标所在行的上方粘贴
+
+
+第二章 磁盘管理
+
+
+2-1 Linux磁盘管理基本命令
+
+#df 查看磁盘分区使用状况
+   -l 仅显示本地磁盘（默认）
+   -a 显示所有文件系统的磁盘使用情况，包含比如/proc/
+   -h 以1024进制计算最合适的单位显示磁盘容量
+   -H 以1000进制计算最合适的单位显示磁盘容量
+   -T 显示磁盘分区类型
+   -t 显示指定类型文件系统的磁盘分区
+   -x 不显示指定类型文件系统的磁盘分区
+#du 统计磁盘上的文件大小
+   -b 以byte为单位统计文件
+   -k 以KB为单位统计文件
+   -m 以MB为单位统计文件
+   -h 按照1024进制以最合适的单位统计文件
+   -H 按照1000进制以最合适的单位统计文件
+   -s 指定统计目标
+2-2 Linux硬盘分区和格式化概念
+
+2-3 Linux在VM虚拟机中添加硬盘
+
+2-4 Linux中MBR分区
+
+#fdisk
+#fdisk -l（分区列表）
+# fdisk /dev/sdb(设备位置)
+输入m 查看帮助信息
+输入n 添加新分区
+#fdisk(查看磁盘信息)
+#fdisk -l(查看磁盘分区)
+#fdisk /dev/sdb (进入sdb分区模式)
+进入分区模式后，输入m，查看帮助命令
+输入n，给硬盘添加一个新分区
+
+2-5 Linux中GPT分区
+
+磁盘分区与格式化
+*分区模式值MBR
+   -主分区不超过4个
+   -单个分区容量最大2T
+*分区模式值GPT
+   -主分区个数“几乎”没有限制（最大允许128个）
+   -单个分区容量“几乎”没有限制
+比较：
+（1）在GPT的分区模式中，每个分区的大小突破了MBR分区的2TB限制（最多可以达到18EB）
+（2）GPT的主分区中，不太适合X86架构的系统
+#parted
+
+2-6 Linux中分区的格式化
+
+#mkfs.ext3 /dev/sdb1
+*将硬盘sdb1格式化为ext3文件系统
+#mkfs -t ext4 /dev/sdb2
+*将sdb2格式化为ext4文案系统
+
+注意：
+（1）MBR分区表磁盘中的扩展分区不可格式化，只有主分区和逻辑分区才可以格式化
+（2）GBT的分区表的硬盘格式化后，我们使用fdisk这些命令是没有办法看到各个磁盘分区的信息，必须启动parted分区工具，使用print指令查看GBT硬盘的分区表
+
+2-7  Linux中挂载分区
+
+#mkdir -p /mnt/cdrom
+#mount /dev/sdb1 /mnt/cdrom
+卸载：
+#umount /mnt/cdrom
+注意：
+通过命令挂载磁盘，只是暂时性的，一旦系统重启，挂载失效，需要编辑/etc/fstab文件
+#vim + /etc/fstab
+在末尾添加配置，配置前三个分别是：设备名称，挂载点，文件系统类型，后面添加defaults，两个数字0，保存退出即可
+
+2-8 Linux中swap分区
+
+如何为硬盘添加swap交换分区？
+第一，建立一个普通的Linux分区
+第二，修改分区类型的16进制编码
+第三，格式化交换分区
+第四，启用交换分区
+例如：
+#fdisk /dev/sdb
+*输入p,以sdb6作为要添加的swap分区磁盘块
+*修改分区类型编号，输入t,回车，选择分区编号6，借助l查看分区编号，输入82（swap分区编号），回车，保存退出。
+*格式化swap分区
+#mkswap /dev/sdb6
+*启用分区
+#swapon /dev/dsb6
+*查看加载状况
+#free
+*关闭swap分区
+#swapoff /dev/sdb6
+
+
+第三章 用户管理
+
+
+3-1 Linux中用户和用户组的概念
+
+* 用户：使用操作系统的人
+* 用户组：具有相同系统权限的一组用户
+
+#/etc/group 存储当前系统中所有用户组信息
+- Group: x : 123 : abc,def,xyz
+-组名称：组密码占位符：组编号：组中用户名列表
+注意：
+（1）在Linux系统中，root用户组也就是超级用户组，它的组号一定是0
+（2）组号1~499，属于系统预留的组编号，一般来说，是预留给那些安装在操作系统中的软件或者服务，比如在服务器上安装MySQL服务。越早安装的软件或者服务，其编号越小，就是说，一般情况下，把未被使用的最小组号分配给新安装的软件或者服务。
+（3）用户手动创建的组号是从500开始。一般情况下，把大于等于500，并且未被使用的最小组号分配给用户手动创建的用户组。
+（4）组密码占位符无一例外全是用x表示。
+#/etc/gshadow 存储当前系统中用户组的密码信息
+-Group: * :   : abc,def,xyz
+-组名称：组密码：组管理者：组中用户名列表
+#/etc/passwd 存储当前系统中所有用户的信息
+- user : x : 123 : 456 : xxxxxx : /home/user : /bin/bash
+- 用户名：密码占位符：用户编号：用户组编号：用户注释信息：用户主目录：shell类型
+#/etc/shadow 存储当前系统中所有用户组的密码信息
+- user :vf;/Zu8sdf...:::::
+-用户名：密码 :::::
+
+3-2 Linux中用户和用户组的基本命令
+
+#groupadd cangls 添加用户组cangls
+#groupmod -n boduols cangls 将用户组cangls改名为boduols
+#groupmod -g 668 boduols 将boduols用户组编号改为668
+#groupadd -g 888 boss 创建指定编号为888，组名为boss的用户组
+#groupdel boduols 删除boduols用户组
+#useradd -g boduols sdf 给用户组boduols添加用户sdf
+#useradd -g boduols jzmb
+#useradd -d /home/xxx imooc
+*创建用户时，通过-d参数，指定用户的个人文件夹
+#usermod -c dgdzmx sdf
+*给用户添加注释
+#usermod -l cangls sdf 修改用户名sdf为cangls
+#usermod -g boduols imooc 将用户imooc的属组改为boduols
+#userdel jzmb 删除用户jzmb
+#userdel -r jzmb 删除用户jzmb以及其个人文件
+#touch /etc/nologin 禁止除了root账户其他意外的用户登录
+
+3-3 Linux中用户和用户组进阶命令
+
+#passwd -l cangls 锁定账户cangls
+#passwd -u cangls 解锁账户cangls
+#passed -d cangls 设置账户cangls无密码登录
+
+主要组和附属组
+*用户可以同时属于多个组
+  -一个主要组
+  -多个附属组
+#gpasswd -a cangls boss 将用户cangls添加到boss用户组（附属组）
+注意：当一个用户属于多个用户组的时候，其创建文件默认属于主要组
+#newgrp boss 用户切换附属组boss
+#gpasswd -d cangls boss 将用户cangls 从boss组中去掉
+#useradd -g group1 -G group2,group3.... 创建用户同时指定主要组和多个附属组
+#gpasswd imooc 给用户imooc设置用户组密码
+
+3-4 Linux中用户管理其他命令
+
+#su username 切换用户身份
+
+其他命令
+#Whoami
+ -我是谁？显示当前登录用户名
+#id imooc
+ -显示指定用户信息，包括用户编号和用户名
+ -主要组编号及名称，附属组列表
+#groups imooc
+ -显示imooc用户所在的所有组
+#chfn imooc
+ -设置用户资料，依次输入用户资料
+#finger imooc
+ -显示用户详细资料
