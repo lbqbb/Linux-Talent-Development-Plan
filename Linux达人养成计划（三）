@@ -1,0 +1,265 @@
+Linux达人养成计划（三）
+
+第一章 网络基础
+
+
+1-1 概述
+
+Linux网络管理
+网络基础、Linux网络配置、Linux网络命令、远程登录
+
+1-2 Linux网络基础之ISO/OSI七层模型简介
+
+ISO：国际标准化组织
+OSI：开放系统互联模型
+IOS：苹果操作系统  
+
+OSI的七层模型：
+7   应用层<--------应用层协议------>应用层 APDU
+      ^                              ^
+      |                              |  接口
+      v                              v
+6   表示层<--------表示层协议------>表示层 PPDU
+      ^                              ^
+      |                              |  接口
+      v                              v
+5   会话层<--------会话层协议------>会话层 SDPU
+      ^                              ^
+      |                              |  接口
+      v                              v
+4   传输层<--------传输层协议------>传输层 TPDU
+      ^                              ^
+      |                              |  接口
+      v                              v
+3   网络层<--------网络层协议------>网络层 报文
+      ^                              ^
+      |                              |  接口
+      v                              v
+2   数据链路层<--数据链路层协议->数据链路层 帧
+      ^                              ^
+      |                              |  接口
+      v                              v
+1   物理层<-------物理层协议------->物理层 比特
+    主机A                          主机B  数据单位
+
+上三层为用户提供服务，下四层为数据传递提供服务
+数据发送从上层到下层，接收从下层到上层
+注意：IP地址用于外网通信，MAC地址用于局域网通信
+
+1-3 Linux网络之ISO/OSI七层模型详解
+
+表示层：数据的表现形式、特定功能的实现如-加密
+传输层：可靠与不可靠的传输、传输前的错误检测、流控
+网络层：提供逻辑地址、选路
+数据链路层：成帧、用MAC地址访问媒介、错误检测与修正
+物理层：设备之间的比特流的传输、物理接口、电气特性等
+
+1-4 Linux网络基础之TCP/IP四层模型
+
+应用层
+传输层
+网际互联层
+网络接口层
+
+TCP/IP模型与OSI模型的比较
+**共同点
+（1）OSI参考模型和TCP/IP参考模型都采用了层次结构的概念，
+（2）都能够提供面向连接和无连接两种通信服务机制；
+**不同点
+（1)前者是七层模型，后者是四层结构
+（2）对可靠性要求不同（后者更高）
+（3）OSI模型是在协议开发前设计的，具有通用性。TCP/IP是先有协议集然后建立模型，不适用于非TCP/IP网络。
+
+1-5 Linux网络基础之IP地址详解
+
+网络分类     最大网络数        IP地址范围         最大主机数         私有IP地址范围
+A       126(2^7-2)    1.0.0.0--126.255.255.255   2^24-2  10.0.0.0--10.255.255.255
+B    16384(2^14)     128.0.0.0--191.255.255.255  2^16-2  172.16.0.0--
+                                                         172.31.255.255
+C    2097152(2^21)   192.0.0.0--223.255.255.255  2^8-2   192.168.0.0--
+                                                         192.168.255.255
+1-6 子网掩码的使用
+
+1-7 Linux网络基础之端口作用
+
+常见端口号
+FTP（文件传输协议）：端口号 20 21
+SSH（安全shell协议）：端口号 22
+telnet(远程登录协议)：端口号 23
+DNS(域名系统)：端口号 53
+http（超文本传输协议）：端口号 80
+SMTP（简单邮件传输协议）：端口号 25
+POP3（邮局协议3代）：端口号 110
+
+查看本机启用的端口
+#netstat -an
+*选项：
+     -a : 查看所有连接和监听端口
+     -n : 显示IP地址和端口号，而不显示域名和服务名
+
+1-8 Linux网络基础之DNS作用
+
+DNS服务的作用
+* 将域名解析为IP地址
+  -客户机向DNS服务器发送域名查询请求
+  -DNS服务器告知客户机web服务器的IP地址
+  -客户机与web服务器通信
+
+1-9 Linux网络基础之网关作用
+
+网关作用
+1、网关（GATEWAY)又称网间连接器、协议转换器。
+2、网关在网络层以上实现网络互连，是最复杂的网络互连设备，仅用于两个高层协议不同的网络互连。
+3、网关既可以用于广域网互连，也可以用于局域网互连。
+4、网关是一种充当转换重任的服务器或路由器。
+
+第2章 Linux网络配置
+
+
+2-1 Linux网络配置值IP地址配置
+
+Linux配置IP地址的方法
+1）ifconfig命令临时配置IP地址
+2）setup工具永久配置IP地址
+3）修改网络配置文件
+4）图形界面配置IP地址
+
+ifconfig命令
+#ifconfig命令：查看与配置网络状态
+#ifconfig eth0 192.168.0.200 netmask 255.255.255.0
+*临时设置eth0网卡的IP地址与子网掩码
+
+setup工具
+*红帽专有图形化工具setup设置IP地址
+
+2-2 Linux网络配置之使用文件配置IP地址
+
+1、网卡信息文件
+#vi /etc/sysconfig/network-scripts/ifcfg-eth0
+DEVICE=eth0                              网卡设备名
+BOOTPROTO=none                           是否自动获取IP(no、static、dhcp)
+HWADDR=00:0c:29:17:c4:09                 MAC地址
+NM_CONTROLLED=yes                        是否可以由Network Manager图形管理工具托管
+ONBOOT=yes                               是否随网络服务启动，eth0生效
+TYPE=Ethernet                            类型为以太网
+UUID="44b768a-b59f-44d5-83fa-7f98fda86b3d"      唯一识别码
+IPADDR=192.168.0.252                     IP地址
+NETMASK=255.255.255.0                    子网掩码
+GATEWAY=192.168.0.1                      网关
+DNS1=202.106.0.20                        DNS
+IPV6INIT=no                              IPV6没有启用
+USERCTL=no                               不允许非root用户控制此网卡
+
+2、主机名文件
+#vi /etc/sysconfig/network
+NETWORKING=yes
+HOSTNAME=localhost.localdomain
+
+#hostname [主机名]
+*查看和零时设置主机名命令
+
+3、DNS配置文件
+#vi /etc/resolv.conf
+nameserver 202.106.0.20
+search localhost
+
+2-3 Linux网络配置之虚拟机网络配置
+
+1、配置LinuxIp地址
+#setup
+*配置并修改IP地址
+2、启动网卡
+#vi /etc/sysconfig/network-scripts/ifcfg-eth0
+把 ONBOOT=no
+改为 ONBOOT=yes
+#service network restart
+*重启网络服务
+3、修改UUID（复制Linux才进行此步）
+1）#vi /etc/sysconfig/network-scripts/ifcfg-eth0
+*删除MAC地址行
+2）#rm -rf /etc/udev/rules.d/70-persistent-net.rules
+*删除网卡和Mac地址绑定文件
+3）重启系统
+4、设置虚拟机网络连接方式
+建议选择桥接
+5、修改桥接网卡
+无线网卡一定带有wireless字样
+
+
+第三章 Linux网络命令
+
+
+3-1 Linux网络命令之网络环境查看命令
+
+1、ifconfig命令
+ifconfig命令：查看与配置网络状态命令
+2、关闭与启动网卡
+#ifdown 网卡设备名
+*禁用该网卡设备
+#ifup 网卡设备名
+*启用该网卡设备
+3、查询网络状态
+#netstat 选项
+选项：
+     -t ：列出TCP协议端口
+     -u ：列出UDP协议端口
+     -n ：不使用域名与服务名，而使用IP地址和端口号
+     -l ：仅列出监听状态网络服务
+     -a ：列出所有的网络连接
+例如：
+#netstat -tuln 查看本机开启的端口服务
+#netstat -an 
+#netstat -an | grep ESTABLISHED  统计连接到本服务器的机器数
+#netstat -an | grep ESTABLISHED | wc -l
+*统计连接IP行数
+#netstat -rn 查看路由列表（可以看到网关）
+4、route命令
+#route -n 
+*查看路由列表（可以看到网关）
+#route add default gw 192.168.1.1
+*临时设定网关
+5、域名解析命令
+#nslookup [主机名或IP]
+*进行域名与IP地址解析
+#nslookup
+#> server
+*查看本机DNS服务器
+
+3-2 Linux网络，命令之网络测试命令
+
+1、ping 命令
+#ping [选项] ip或域名
+*探测指定IP或域名的网络状况
+选项：
+    -c 次数：指定ping包的次数
+2、telnet 命令
+#telnet [域名或IP] [端口]
+*远程管理与端口探测命令
+比如：
+#telnet 192.168.0.252 80
+3、traceroute
+#traceroute [选项] IP或域名
+*路由跟踪命令
+
+选项：
+    -n  使用IP，不使用域名，速度更快
+4、wget命令
+*下载命令
+5、tcpdump命令
+#tcpdump -i eth0 -nnX port 21
+选项：
+    -i   指定网卡接口
+    -nn  将数据包中的域名与服务转为IP和端口
+    -X   以十六进制和ASCII码显示数据包内容
+    port  指定监听的端口
+
+第4章 远程登录工具
+
+
+4-1 SSH协议原理
+
+
+4-2 Linux远程登录工具SecureCRT
+
+
+4-3 Xshell和WinSCP工具
